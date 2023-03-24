@@ -1,0 +1,250 @@
+<html>
+
+<head>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Moon+Dance&family=Source+Serif+Pro:ital@1&display=swap" rel="stylesheet">
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <!-- JavaScript and dependencies -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zxing/library@0.19.0@zxing.library.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@zxing/browser@0.19.0@zxing.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+   <title>Location Scanning</title>
+  
+  <script src="https://rawgit.com/dwa012/html5-qrcode/master/html5-qrcode.min.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.7/html5-qrcode.min.js" 
+    integrity="sha512-dH3HFLqbLJ4o/3CFGVkn1lrppE300cfrUiD2vzggDAtJKiCClLKjJEa7wBcx7Czu04Xzgf3jMRvSwjVTYtzxEA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+      body {
+        font-family: 'Dancing Script', cursive;
+        font-family: 'Moon Dance', cursive;
+        font-family: 'Source Serif Pro', serif;
+      }
+      
+      #reader {
+        width: 90vw;
+        height: 50vh;
+        position: relative;
+        border: 1px solid #000;
+        margin: 0 auto;
+       
+      }
+      
+      #scanner-video {
+        width: 50%;
+        height: auto;
+      }
+      
+      input[type="text"] {
+        display: block;
+        margin-bottom: 10px;
+        width: 100%;
+        font-size: 1rem;
+      }
+  
+      @media screen and (min-width: 768px) {
+        /* apply styles for screens wider than 768px */
+        #reader {
+          width: 50vw;
+          height: 34vh;
+          left: 1rem;
+        }
+        
+        #scanner-video {
+          width: 150px;
+          height: 100px;
+        }
+        #scan
+
+        {
+          position: relative;
+          top: 1rem;
+        }
+        
+        
+        
+      }
+    </style>
+</head>
+
+<body>
+
+
+  <div class="container">
+    <h1 class="text-center mt-5">QR Scanner</h1>
+    <div id="reader"></div>
+    
+    <div class="form-group">
+     
+      <label for="product-name">QR:</label>
+      <input type="text" id="product-name" name="product-name" class="form-control">
+    </div>
+   
+    <div class="form-group">
+      <label for="product-quantity">GARDEN</label>
+      <input type="text" id="product-quantity" name="product-quantity" class="form-control">
+    </div>
+ 
+      <div class="form-group">
+        <label for="barcode-input">GRADE</label>
+        <input type="text" id="barcode-input" name="barcode" autofocus class="form-control">
+      </div>
+     
+     
+      <div class="form-group">
+        
+        <label for="INV">INV:</label>
+        <input type="text" id="INV" name="product-quantity" class="form-control">
+      </div>
+
+      
+        
+        <div class="form-group">
+        <label for="BAGS">BAGS</label>
+        <input type="text" id="BAGS" name="BAGS" class="form-control">
+      
+      
+        <label for="product-location">Location:</label>
+        <input type="text" id="product-location" name="product-location" class="form-control">
+      </div>
+
+
+      <div class="form-group">
+        <label for="qr-file">Upload QR code:</label>
+        <input type="file" id="qr-file" accept="image/*" class="form-control-file">
+      </div></div>
+
+      
+      <button type="submit" class="btn btn-success mt-3 form-control" id="submit" onclick="handleSubmit()">Submit</button>
+    <button onclick="scanQRCode()" id="scan" class="btn btn-primary form-control">Scan QR Code</button>
+  
+  <center>
+<footer>&copy vishal jadhav</footer>
+</center>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+<script>
+  let reader = new Html5Qrcode('reader');
+  let isScanning = false;
+
+  function scanQRCode() {
+    if (isScanning) {
+      reader.stop().then(ignore => {
+        isScanning = false;
+        console.log('Stopped');
+      }).catch(err => console.error(err));
+    } else {
+      reader.start({facingMode: 'environment'},
+        {
+          qrbox: 250,
+          formats: ['qr', 'aztec', 'ean', 'code128'] // Add the formats you want to support here
+        },
+        qrCodeSuccessCallback,
+        qrCodeErrorCallback
+      ).then(ignore => {
+        isScanning = true;
+        console.log('Started');
+      }).catch(err => console.error(err));
+    }
+  }
+  html5QrCode.start({ 
+    videoSize: { 
+        width: 640, 
+        height: 200 
+    } 
+}, qrCodeSuccessCallback);
+  function qrCodeSuccessCallback(qrCodeMessage) {
+    let productInfo = qrCodeMessage.split(',');
+    document.getElementById('product-name').value = productInfo[0];
+    document.getElementById('product-quantity').value = productInfo[1];
+    document.getElementById('product-location').value = productInfo[2];
+    
+  }
+
+  function qrCodeErrorCallback(error) {
+    console.log(`QR Code Error: ${error}`);
+  }
+
+  document.getElementById('qr-file').addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const qrCodeMessage = event.target.result;
+      function qrCodeSuccessCallback(qrCodeMessage) {
+        let productInfo = qrCodeMessage.split(',');
+        document.getElementById('product-name').value = '';
+        document.getElementById('product-quantity').value = '';
+        document.getElementById('product-location').value = '';
+        document.getElementById('barcode-input').value = productInfo[0];
+      }
+    };
+    reader.readAsText(file);
+  });
+
+
+  const SHEETDB_API_ENDPOINT = 'https://sheetdb.io/api/v1/t3wxlrqk4uea3';
+const SHEETDB_API_KEY = 't3wxlrqk4uea3';
+function qrCodeSuccessCallback(qrCodeMessage) {
+  let productInfo = qrCodeMessage.split(',');
+  document.getElementById('product-name').value = productInfo[0];
+  document.getElementById('product-quantity').value = productInfo[1];
+  document.getElementById('product-location').value = productInfo[2];
+}
+
+function handleSubmit() {
+  let QR = document.getElementById('product-name').value;
+  let GARDEN = document.getElementById('product-quantity').value;
+  let LOCATION = document.getElementById('product-location').value;
+  let INV = document.getElementById('INV').value;
+  let BAGS = document.getElementById('BAGS').value;
+  let GRADE = document.getElementById('barcode-input').value;
+  let data = {
+    QR: QR,
+    GARDEN: GARDEN,
+    LOCATION: LOCATION,
+    INV: INV,
+    BAGS:BAGS,
+    GRADE: GRADE,
+  };
+  fetch(SHEETDB_API_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SHEETDB_API_KEY}`,
+    },
+    body: JSON.stringify(data),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    if (data.status === 201) {
+      alert('Data submitted successfully!');
+      window.location.reload(); // Reload the page
+    } else {
+      alert('Data submission success!');
+      window.location.reload();
+    }
+  })
+  .catch(error => console.error(error));
+}
+
+
+      // Reset the form after successful 
+
+function qrCodeErrorCallback(error) {
+  console.log(`QR Code Error: ${error}`);
+  console.error(error);
+}
+
+
+          </script>
+    </html>
