@@ -71,6 +71,12 @@ footer
 {
   background-color: black;
 }
+    #logout
+
+{
+  position: relative;
+  float: right;
+}
   </style>
 </head>
 <body>
@@ -82,6 +88,7 @@ footer
      
 
       <a href="index2.html">BACK</a>
+       <button type="button" id="logout" class="btn btn-outline-secondary ml-auto" onclick="logout()">Logout</button>
       <center>
       <h4>Location & QR Scanner</h4>
     </center>
@@ -117,6 +124,14 @@ footer
 </center>
   <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
   <script>
+    
+    function logout() {
+  // Clear user data from local storage
+  localStorage.removeItem('user');
+  // Redirect to login page
+  window.location.href = 'index.html';
+}
+
   let scanner;
 let productList = [];
 
