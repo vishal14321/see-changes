@@ -1,6 +1,8 @@
 <html>
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <script src="https://apis.google.com/js/api.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +30,12 @@
         font-family: 'Moon Dance', cursive;
         font-family: 'Source Serif Pro', serif;
       }
+      @media screen and (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+}
+
       
       #reader {
         width: 90vw;
@@ -66,10 +74,14 @@
 
         {
           position: relative;
-          top: 1rem;
+          top: 0rem;
+          border-radius: 25px;
+          
         }
         
-        
+        button {
+          border-radius: 25px;
+        }
         
       }
     </style>
@@ -77,9 +89,11 @@
 
 <body>
 
-
+<!-- Navbar --> <nav class="navbar navbar-expand-lg navbar-light bg-light"> <div class="container-fluid"> <!-- Brand --> <a class="navbar-brand" href="#">VIKRAM</a> <!-- Logout Button --> <button type="button" class="btn btn-outline-secondary ml-auto" onclick="logout()">Logout</button> </div> </nav> <!-- Main Content --> <div class="container mt-5"><center ><h1>QR Scanner</h1>
+  <p>This is in underdevloment program.</p> </div> 
+</center>
   <div class="container">
-    <h1 class="text-center mt-5">QR Scanner</h1>
+    
     <div id="reader"></div>
     
     <div class="form-group">
@@ -126,79 +140,77 @@
       <button type="submit" class="btn btn-success mt-3 form-control" id="submit" onclick="handleSubmit()">Submit</button>
     <button onclick="scanQRCode()" id="scan" class="btn btn-primary form-control">Scan QR Code</button>
   
-  <center>
-<footer>&copy vishal jadhav</footer>
-</center>
+   <footer class="bg-light text-center py-3"> <p>Vishal Jadhav&copy; 2023</p> </footer> <!-- Logout Function --> 
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 <script>
+
+
+  function logout() {
+  // Clear user data from local storage
+  localStorage.removeItem('user');
+  // Redirect to login page
+  window.location.href = 'index.html';
+}
+
+  
+  
   let reader = new Html5Qrcode('reader');
-  let isScanning = false;
+let isScanning = false;
 
-  function scanQRCode() {
-    if (isScanning) {
-      reader.stop().then(ignore => {
-        isScanning = false;
-        console.log('Stopped');
-      }).catch(err => console.error(err));
-    } else {
-      reader.start({facingMode: 'environment'},
-        {
-          qrbox: 250,
-          formats: ['qr', 'aztec', 'ean', 'code128'] // Add the formats you want to support here
-        },
-        qrCodeSuccessCallback,
-        qrCodeErrorCallback
-      ).then(ignore => {
-        isScanning = true;
-        console.log('Started');
-      }).catch(err => console.error(err));
-    }
+function scanQRCode() {
+  if (isScanning) {
+    reader.stop().then(ignore => {
+      isScanning = false;
+      console.log('Stopped');
+    }).catch(err => console.error(err));
+  } else {
+    reader.start({facingMode: 'environment'},
+      {
+        qrbox: 250,
+        formats: ['qr', 'aztec', 'ean', 'code128'] // Add the formats you want to support here
+      },
+      qrCodeSuccessCallback1,
+      qrCodeErrorCallback
+    ).then(ignore => {
+      isScanning = true;
+      console.log('Started');
+    }).catch(err => console.error(err));
   }
-  html5QrCode.start({ 
-    videoSize: { 
-        width: 640, 
-        height: 200 
-    } 
-}, qrCodeSuccessCallback);
-  function qrCodeSuccessCallback(qrCodeMessage) {
-    let productInfo = qrCodeMessage.split(',');
-    document.getElementById('product-name').value = productInfo[0];
-    document.getElementById('product-quantity').value = productInfo[1];
-    document.getElementById('product-location').value = productInfo[2];
-    
-  }
+}
 
-  function qrCodeErrorCallback(error) {
-    console.log(`QR Code Error: ${error}`);
-  }
-
-  document.getElementById('qr-file').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const qrCodeMessage = event.target.result;
-      function qrCodeSuccessCallback(qrCodeMessage) {
-        let productInfo = qrCodeMessage.split(',');
-        document.getElementById('product-name').value = '';
-        document.getElementById('product-quantity').value = '';
-        document.getElementById('product-location').value = '';
-        document.getElementById('barcode-input').value = productInfo[0];
-      }
-    };
-    reader.readAsText(file);
-  });
-
-
-  const SHEETDB_API_ENDPOINT = 'https://sheetdb.io/api/v1/t3wxlrqk4uea3';
-const SHEETDB_API_KEY = 't3wxlrqk4uea3';
-function qrCodeSuccessCallback(qrCodeMessage) {
+function qrCodeSuccessCallback1(qrCodeMessage) {
   let productInfo = qrCodeMessage.split(',');
   document.getElementById('product-name').value = productInfo[0];
   document.getElementById('product-quantity').value = productInfo[1];
   document.getElementById('product-location').value = productInfo[2];
 }
+
+function qrCodeSuccessCallback2(qrCodeMessage) {
+  let productInfo = qrCodeMessage.split(',');
+  document.getElementById('product-name').value = '';
+  document.getElementById('product-quantity').value = '';
+  document.getElementById('product-location').value = '';
+  document.getElementById('barcode-input').value = productInfo[0];
+}
+
+function qrCodeErrorCallback(error) {
+  console.log(`QR Code Error: ${error}`);
+}
+
+document.getElementById('qr-file').addEventListener('change', (event) => {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const qrCodeMessage = event.target.result;
+    qrCodeSuccessCallback2(qrCodeMessage);
+  };
+  reader.readAsText(file);
+});
+
+const SHEETDB_API_ENDPOINT = 'https://sheetdb.io/api/v1/t3wxlrqk4uea3';
+const SHEETDB_API_KEY = 't3wxlrqk4uea3';
 
 function handleSubmit() {
   let QR = document.getElementById('product-name').value;
@@ -237,6 +249,9 @@ function handleSubmit() {
   .catch(error => console.error(error));
 }
 
+// Reset the form
+
+
 
       // Reset the form after successful 
 
@@ -247,4 +262,4 @@ function qrCodeErrorCallback(error) {
 
 
           </script>
-    </html>
+  </html>
