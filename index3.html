@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Scan Products</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Labrada:ital,wght@1,300&family=Satisfy&display=swap" rel="stylesheet">
+  <style>
+
+   body
+   {
+    color: white;
+    font-family: 'Labrada', serif;
+
+   }
+#preview
+{
+  width: 80%;
+}
+p
+
+{
+position: relative;
+float: right;
+}
+.card {
+  position: relative;
+  overflow: hidden;
+  background-color: black;
+  z-index: 2;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.5px solid transparent;
+  animation: border-run 5s linear infinite;
+  z-index: -1;
+}
+
+@keyframes border-run {
+  0% {
+    border-color: #333;
+  }
+  25% {
+    border-color: #ff0000;
+  }
+  50% {
+    border-color: #008cff;
+  }
+  75% {
+    border-color: #0000ff;
+  }
+  100% {
+    border-color: #333;
+  }
+}
+
+footer
+{
+  background-color: black;
+}
+  </style>
+</head>
+<body>
+ 
+  <div class="card">
+    
+    <div class="card-header">
+    
+     
+
+      <a href="index2.html">BACK</a>
+      <center>
+      <h4>Location & QR Scanner</h4>
+    </center>
+     
+    </div>
+    <div class="card-body">
+      <center>
+      <video id="preview" class="p-1" style="width:100%;"></video>
+    </center>
+      <hr>
+
+      <div id="scan-controls">
+        <button type="button" class="btn btn-primary" id="start-btn">Start Scanner</button>
+        <button type="button" class="btn btn-danger" id="stop-btn" disabled>Stop Scanner</button>
+      </div>
+      <div class="form-group">
+        <label for="product-name">Scanned QR</label>
+        <input type="text" class="form-control" id="product-name">
+        <label for="location">Location:</label>
+        <input type="text" class="form-control" id="Location">
+      </div>
+      <button class="btn btn-primary" id="add-product-btn">Add QR CODE</button>
+      <hr>
+      <h5>Scanned QR List</h5>
+      <ul id="product-list">
+      </ul>
+    </div>
+    <button type="button" class="btn btn-success" onclick="handleSubmit()"  id="submit-btn">submit</button>
+  </div>
+  </div>
+  <center>
+  <footer>&copy vishal jadhav</footer>
+</center>
+  <script src="https://rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+  <script>
+  let scanner;
+let productList = [];
+
+// Function to start the scanner
+function startScanner() {
+  Instascan.Camera.getCameras()
+    .then(function (cameras) {
+      if (cameras.length > 0) {
+        scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+        scanner.addListener('scan', function (content) {
+          document.getElementById('product-name').value = content;
+        });
+        scanner.addListener('error', function (error) {
+          console.error(error);
+        });
+        scanner.start(cameras[0]);
+        document.getElementById('start-btn').disabled = true;
+        document.getElementById('stop-btn').disabled = false;
+      } else {
+        console.error('No cameras found.');
+      }
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+}
+
+// Function to stop the scanner
+function stopScanner() {
+  scanner.stop();
+  document.getElementById('start-btn').disabled = false;
+  document.getElementById('stop-btn').disabled = true;
+}
+
+// Event listener for the start button
+document.getElementById('start-btn').addEventListener('click', function () {
+  startScanner();
+});
+
+// Event listener for the stop button
+document.getElementById('stop-btn').addEventListener('click', function () {
+  stopScanner();
+});
+
+// Event listener for adding products
+document.getElementById('add-product-btn').addEventListener('click', function () {
+  let productName = document.getElementById('product-name').value;
+  if (productName) {
+    productList.push(productName);
+    document.getElementById('product-list').innerHTML += '<li>' + productName + '</li>';
+    document.getElementById('product-name').value = '';
+  }
+});
+
+// Event listener for submitting data
+document.getElementById('submit-btn').addEventListener('click', function () {
+  submitData();
+});
+
+const SHEETDB_API_ENDPOINT = 'https://sheetdb.io/api/v1/e3ylmox0m4sqi?sheet=Sheet2';
+const SHEETDB_API_KEY = 'e3ylmox0m4sqi';
+
+function handleSubmit() {
+  let QR = document.getElementById('product-name').value;
+  let Location = document.getElementById('Location').value;
+  let product = document.querySelectorAll('#product-list li');
+
+  let Pallet = '';
+  product.forEach(function(li) {
+    Pallet += li.textContent + ' ';
+  });
+
+  let data = {
+    QR: QR,
+    Location: Location,
+    Pallet: Pallet.trim(),
+  };
+  
+  fetch(SHEETDB_API_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SHEETDB_API_KEY}`,
+    },
+    body: JSON.stringify(data),
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    if (data.status === 201) {
+      alert('Data submitted successfully!');
+      window.location.reload(); // Reload the page
+    } else {
+      alert('Data submission success!');
+      window.location.reload();
+    }
+  })
+  .catch(error => console.error(error));
+
+}
+
+ 
+
+</script>
+    
+  
+</body>
+</html>
