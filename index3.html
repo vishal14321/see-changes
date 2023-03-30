@@ -132,7 +132,7 @@ function startScanner() {
         scanner.addListener('error', function (error) {
           console.error(error);
         });
-        scanner.start(cameras[0]);
+        scanner.start(cameras[2]);
         document.getElementById('start-btn').disabled = true;
         document.getElementById('stop-btn').disabled = false;
       } else {
