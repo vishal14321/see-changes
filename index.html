@@ -173,6 +173,22 @@
       "retina_detect": true
     });
   </script>
-
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.querySelector('#login-form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        var username = document.querySelector('#username').value;
+        var password = document.querySelector('#password').value;
+        if (username === 'vishal' && password === 'vishal14321') {
+          // Store user data in session storage
+          sessionStorage.setItem('user', JSON.stringify({ username: username }));
+          // Redirect to index2.html
+          window.location.href = 'index2.html';
+        } else {
+          alert('Invalid username or password!');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
